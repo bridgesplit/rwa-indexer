@@ -28,7 +28,6 @@ impl RwaApi {
             .max_connections(250)
             .connect(&config.database_url)
             .await?;
-
         let conn = SqlxPostgresConnector::from_sqlx_postgres_pool(pool);
         Ok(RwaApi {
             db_connection: conn,
@@ -57,6 +56,30 @@ impl ApiContract for RwaApi {
     }
 
     async fn get_rwa_accounts_by_mint(
+        self: &RwaApi,
+        payload: GetRwaAccountsByMint,
+    ) -> Result<FullAccount, RwaApiError> {
+        let GetRwaAccountsByMint { id } = payload;
+        let id_bytes = validate_pubkey(id.clone())?.to_bytes().to_vec();
+
+        get_rwa_accounts_by_mint(&self.db_connection, id_bytes)
+            .await
+            .map_err(Into::into)
+    }
+
+    async fn get_rwa_accounts_by_authority(
+        self: &RwaApi,
+        payload: GetRwaAccountsByMint,
+    ) -> Result<FullAccount, RwaApiError> {
+        let GetRwaAccountsByMint { id } = payload;
+        let id_bytes = validate_pubkey(id.clone())?.to_bytes().to_vec();
+
+        get_rwa_accounts_by_mint(&self.db_connection, id_bytes)
+            .await
+            .map_err(Into::into)
+    }
+
+    async fn get_rwa_accounts_by_delegate(
         self: &RwaApi,
         payload: GetRwaAccountsByMint,
     ) -> Result<FullAccount, RwaApiError> {

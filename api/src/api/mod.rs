@@ -28,4 +28,24 @@ pub trait ApiContract: Send + Sync + 'static {
         &self,
         payload: GetRwaAccountsByMint,
     ) -> Result<rwa_types::rapi::FullAccount, RwaApiError>;
+
+    #[rpc(
+        name = "getRwaAccountsByAuthority",
+        params = "named",
+        summary = "Get all RWA accounts by its mint"
+    )]
+    async fn get_rwa_accounts_by_authority(
+        &self,
+        payload: GetRwaAccountsByMint,
+    ) -> Result<rwa_types::rapi::FullAccount, RwaApiError>;
+
+    #[rpc(
+        name = "getRwaAccountsByDelegate",
+        params = "named",
+        summary = "Get all RWA accounts by its mint"
+    )]
+    async fn get_rwa_accounts_by_delegate(
+        &self,
+        payload: GetRwaAccountsByMint,
+    ) -> Result<rwa_types::rapi::FullAccount, RwaApiError>;
 }
