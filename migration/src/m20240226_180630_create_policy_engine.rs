@@ -1,10 +1,9 @@
 use enum_iterator::all;
-use sea_orm_migration::{
-    prelude::*,
-    sea_orm::{ConnectionTrait, DatabaseBackend, Statement},
-};
+use sea_orm_migration::prelude::*;
 
-use crate::model::table::{PolicyAccount, PolicyAccountType, PolicyEngine, PolicyEngineVersion};
+use crate::model::table::{
+    ComparisionType, Policy, PolicyAccount, PolicyEngine, PolicyEngineVersion, PolicyType,
+};
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
@@ -78,21 +77,6 @@ impl MigrationTrait for Migration {
                             .not_null(),
                     )
                     .col(
-                        ColumnDef::new(PolicyAccount::ComparsionType)
-                            .integer()
-                            .not_null(),
-                    )
-                    .col(ColumnDef::new(PolicyAccount::IdentityLevels).json_binary())
-                    .col(ColumnDef::new(PolicyAccount::Timeframe).big_integer())
-                    .col(
-                        ColumnDef::new(PolicyAccount::PolicyType)
-                            .enumeration(
-                                PolicyAccount::PolicyAccountType,
-                                all::<PolicyAccountType>().collect::<Vec<_>>(),
-                            )
-                            .not_null(),
-                    )
-                    .col(
                         ColumnDef::new(PolicyAccount::SlotUpdated)
                             .big_integer()
                             .not_null(),
@@ -114,11 +98,37 @@ impl MigrationTrait for Migration {
             .await?;
 
         manager
-            .get_connection()
-            .execute(Statement::from_string(
-                DatabaseBackend::Postgres,
-                r#"ALTER TABLE policy_account ADD COLUMN total_limit "uint64_t";"#.to_string(),
-            ))
+            .create_table(
+                Table::create()
+                    .table(Policy::Table)
+                    .if_not_exists()
+                    .col(ColumnDef::new(Policy::Id).binary().not_null().primary_key())
+                    .col(ColumnDef::new(Policy::PolicyAccount).binary().not_null())
+                    .col(
+                        ColumnDef::new(Policy::PolicyType)
+                            .enumeration(
+                                Policy::PolicyType,
+                                all::<PolicyType>().collect::<Vec<_>>(),
+                            )
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(Policy::IdentityLevels)
+                            .json_binary()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(Policy::ComparisionType)
+                            .enumeration(
+                                Policy::ComparisionType,
+                                all::<ComparisionType>().collect::<Vec<_>>(),
+                            )
+                            .not_null(),
+                    )
+                    .col(ColumnDef::new(Policy::Limit).big_unsigned())
+                    .col(ColumnDef::new(Policy::Timeframe).big_integer())
+                    .to_owned(),
+            )
             .await?;
 
         Ok(())
@@ -126,6 +136,10 @@ impl MigrationTrait for Migration {
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
             .drop_table(Table::drop().table(PolicyAccount::Table).to_owned())
+            .await?;
+
+        manager
+            .drop_table(Table::drop().table(Policy::Table).to_owned())
             .await?;
 
         Ok(())

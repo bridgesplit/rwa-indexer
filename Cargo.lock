@@ -574,7 +574,7 @@ checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
 [[package]]
 name = "asset_controller"
 version = "0.0.1"
-source = "git+https://github.com/bridgesplit/rwa-token#3854d5bbf7ab531ca27b9683685543121c0df61d"
+source = "git+https://github.com/bridgesplit/rwa-token?branch=resizable_policies#578e2c280d288bd6ee3ec849f3347b362836bdda"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1723,7 +1723,7 @@ checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 [[package]]
 name = "data_registry"
 version = "0.0.1"
-source = "git+https://github.com/bridgesplit/rwa-token#3854d5bbf7ab531ca27b9683685543121c0df61d"
+source = "git+https://github.com/bridgesplit/rwa-token?branch=resizable_policies#578e2c280d288bd6ee3ec849f3347b362836bdda"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -2725,7 +2725,7 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 [[package]]
 name = "identity_registry"
 version = "0.0.1"
-source = "git+https://github.com/bridgesplit/rwa-token#3854d5bbf7ab531ca27b9683685543121c0df61d"
+source = "git+https://github.com/bridgesplit/rwa-token?branch=resizable_policies#578e2c280d288bd6ee3ec849f3347b362836bdda"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -3982,11 +3982,12 @@ dependencies = [
 [[package]]
 name = "policy_engine"
 version = "0.0.1"
-source = "git+https://github.com/bridgesplit/rwa-token#3854d5bbf7ab531ca27b9683685543121c0df61d"
+source = "git+https://github.com/bridgesplit/rwa-token?branch=resizable_policies#578e2c280d288bd6ee3ec849f3347b362836bdda"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "num_enum 0.7.2",
+ "sha256",
 ]
 
 [[package]]
@@ -5360,6 +5361,19 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest 0.10.7",
+]
+
+[[package]]
+name = "sha256"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18278f6a914fa3070aa316493f7d2ddfb9ac86ebc06fa3b83bffda487e9065b0"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "hex",
+ "sha2 0.10.8",
+ "tokio",
 ]
 
 [[package]]

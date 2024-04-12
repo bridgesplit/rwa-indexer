@@ -1,8 +1,5 @@
 use enum_iterator::all;
-use sea_orm_migration::{
-    prelude::*,
-    sea_orm::{ConnectionTrait, DatabaseBackend, Statement},
-};
+use sea_orm_migration::prelude::*;
 
 use crate::model::table::{AssetController, AssetControllerVersion, TrackerAccount};
 

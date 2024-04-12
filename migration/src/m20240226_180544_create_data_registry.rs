@@ -21,6 +21,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(DataRegistry::AssetMint).binary().not_null())
                     .col(ColumnDef::new(DataRegistry::Authority).binary().not_null())
+                    .col(ColumnDef::new(DataRegistry::Delegate).binary().not_null())
                     .col(
                         ColumnDef::new(DataRegistry::Version)
                             .enumeration(

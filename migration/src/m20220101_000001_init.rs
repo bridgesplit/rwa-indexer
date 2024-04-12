@@ -5,9 +5,9 @@ use sea_orm_migration::{
 };
 
 use crate::model::table::{
-    AssetController, AssetControllerVersion, DataAccount, DataAccountType, DataRegistry,
-    DataRegistryVersion, IdentityAccount, IdentityAccountVersion, IdentityRegistry,
-    IdentityRegistryVersion, PolicyAccount, PolicyAccountType, PolicyEngine, PolicyEngineVersion,
+    AssetController, AssetControllerVersion, ComparisionType, DataAccount, DataAccountType,
+    DataRegistry, DataRegistryVersion, IdentityAccount, IdentityAccountVersion, IdentityRegistry,
+    IdentityRegistryVersion, Policy, PolicyEngine, PolicyEngineVersion, PolicyType,
 };
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -98,13 +98,22 @@ impl MigrationTrait for Migration {
         manager
             .create_type(
                 Type::create()
-                    .as_enum(PolicyAccount::PolicyAccountType)
+                    .as_enum(Policy::PolicyType)
                     .values(vec![
-                        PolicyAccountType::IdentityApproval,
-                        PolicyAccountType::TransactionAmountLimit,
-                        PolicyAccountType::TransactionAmountVelocity,
-                        PolicyAccountType::TransactionCountVelocity,
+                        PolicyType::IdentityApproval,
+                        PolicyType::TransactionAmountLimit,
+                        PolicyType::TransactionAmountVelocity,
+                        PolicyType::TransactionCountVelocity,
                     ])
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_type(
+                Type::create()
+                    .as_enum(Policy::ComparisionType)
+                    .values(vec![ComparisionType::Or, ComparisionType::And])
                     .to_owned(),
             )
             .await?;

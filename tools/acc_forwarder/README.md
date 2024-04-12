@@ -17,7 +17,7 @@ To forward mint and the corresponding rwa accounts for a specific mint, use the 
 Locally:
 
 ```
-cargo run -- --redis-url redis://localhost --rpc-url $RPC_URL mint --mint ArDgz37EWt9tZ48VNeXeZGUxNf63aj4sw6ksVuEeUDBH
+cargo run -- --redis-url redis://localhost --rpc-url http://localhost:8899 mint --mint DyuYvHwMtYGt4xJoToce4CEuBk62uGhiYDXeogwSfD3D
 ```
 
 Dev/Prod:

@@ -1,9 +1,9 @@
 use super::sea_orm_active_enums::{
-    AssetControllerVersion, DataAccountType, DataRegistryVersion, IdentityAccountVersion,
-    IdentityRegistryVersion, PolicyAccountType, PolicyEngineVersion,
+    AssetControllerVersion, ComparisionType, DataAccountType, DataRegistryVersion,
+    IdentityAccountVersion, IdentityRegistryVersion, PolicyEngineVersion, PolicyType,
 };
 use data_registry::state::DataAccountType as ProgramDataAccountType;
-use policy_engine::Policy;
+use policy_engine::{Policy, PolicyType as ProgramPolicyType};
 
 impl From<u8> for AssetControllerVersion {
     fn from(version: u8) -> Self {
@@ -61,15 +61,27 @@ impl From<u8> for PolicyEngineVersion {
     }
 }
 
-impl From<Policy> for PolicyAccountType {
+impl From<u8> for ComparisionType {
+    fn from(comparision_type: u8) -> Self {
+        match comparision_type {
+            1 => ComparisionType::Or,
+            2 => ComparisionType::And,
+            _ => ComparisionType::Or,
+        }
+    }
+}
+
+impl From<Policy> for PolicyType {
     fn from(ptype: Policy) -> Self {
-        match ptype {
-            Policy::IdentityApproval => PolicyAccountType::IdentityApproval,
-            Policy::TransactionAmountLimit { .. } => PolicyAccountType::TransactionAmountLimit,
-            Policy::TransactionAmountVelocity { .. } => {
-                PolicyAccountType::TransactionAmountVelocity
+        match ptype.policy_type {
+            ProgramPolicyType::IdentityApproval => PolicyType::IdentityApproval,
+            ProgramPolicyType::TransactionAmountLimit { .. } => PolicyType::TransactionAmountLimit,
+            ProgramPolicyType::TransactionAmountVelocity { .. } => {
+                PolicyType::TransactionAmountVelocity
             }
-            Policy::TransactionCountVelocity { .. } => PolicyAccountType::TransactionCountVelocity,
+            ProgramPolicyType::TransactionCountVelocity { .. } => {
+                PolicyType::TransactionCountVelocity
+            }
         }
     }
 }

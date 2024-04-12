@@ -63,9 +63,11 @@ pub async fn handle_asset_controller_program_account<'a, 'b, 'c>(
                 id: Set(key_bytes.clone()),
                 asset_mint: Set(ta.asset_mint.to_bytes().to_vec()),
                 owner: Set(ta.owner.to_bytes().to_vec()),
-                transfer_amounts: Set(Some(json!({ "transfer_amounts": ta.transfer_amounts }))),
+                transfer_amounts: Set(Some(
+                    json!({ "transfer_amounts": ta.transfers.iter().map(|t| t.amount).collect::<Vec<_>>()}),
+                )),
                 transfer_timestamps: Set(Some(
-                    json!({ "transfer_timestamps": ta.transfer_timestamps }),
+                    json!({ "transfer_timestamps": ta.transfers.iter().map(|t| t.timestamp).collect::<Vec<_>>() }),
                 )),
                 slot_updated: Set(account_update.slot() as i64),
                 ..Default::default()

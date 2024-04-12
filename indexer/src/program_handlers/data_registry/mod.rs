@@ -24,6 +24,7 @@ pub async fn handle_data_registry_program_account<'a, 'b, 'c>(
                 id: Set(key_bytes.clone()),
                 asset_mint: Set(dr.asset_mint.to_bytes().to_vec()),
                 authority: Set(dr.authority.to_bytes().to_vec()),
+                delegate: Set(dr.delegate.to_bytes().to_vec()),
                 version: Set(DataRegistryVersion::from(dr.version)),
                 closed: Set(false),
                 slot_updated: Set(account_update.slot() as i64),
@@ -36,6 +37,7 @@ pub async fn handle_data_registry_program_account<'a, 'b, 'c>(
                         .update_columns([
                             data_registry::Column::AssetMint,
                             data_registry::Column::Authority,
+                            data_registry::Column::Delegate,
                             data_registry::Column::Version,
                             data_registry::Column::Closed,
                             data_registry::Column::SlotUpdated,

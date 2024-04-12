@@ -145,19 +145,14 @@ pub async fn fetch_and_send_policy_accounts(
     client: &RpcClient,
     messenger: &Arc<Mutex<Box<dyn plerkle_messenger::Messenger>>>,
 ) -> anyhow::Result<()> {
-    const POLICY_ACCOUNT_LEN: u64 = 69;
-
     fetch_and_send_program_accounts(
         POLICY_ENGINE_PROGRAM_ID,
         client,
         messenger,
-        vec![
-            RpcFilterType::DataSize(POLICY_ACCOUNT_LEN),
-            RpcFilterType::Memcmp(Memcmp::new_raw_bytes(
-                REGISTRY_OFFSET,
-                registry.to_bytes().to_vec(),
-            )),
-        ],
+        vec![RpcFilterType::Memcmp(Memcmp::new_raw_bytes(
+            REGISTRY_OFFSET,
+            registry.to_bytes().to_vec(),
+        ))],
     )
     .await?;
     Ok(())

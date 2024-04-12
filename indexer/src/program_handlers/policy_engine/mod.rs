@@ -1,14 +1,13 @@
 use crate::{config::IndexerConfig, error::IndexerError};
-use num_traits::FromPrimitive;
 use plerkle_serialization::AccountInfo;
-use policy_engine::Policy;
+use policy_engine::PolicyType;
 use rwa_types::dao::{
-    policy_account, policy_engine as engine,
-    sea_orm_active_enums::{PolicyAccountType, PolicyEngineVersion},
+    policy, policy_account, policy_engine as engine,
+    sea_orm_active_enums::{ComparisionType, PolicyEngineVersion},
 };
 use sea_orm::{
-    query::*, sea_query::OnConflict, ActiveValue::Set, ConnectionTrait, DatabaseConnection,
-    DbBackend, EntityTrait,
+    query::*, sea_query::OnConflict, ActiveValue::Set, ColumnTrait, ConnectionTrait,
+    DatabaseConnection, DbBackend, EntityTrait,
 };
 use serde_json::json;
 use transformer::programs::policy_engine::PolicyEngineProgram;
@@ -29,7 +28,6 @@ pub async fn handle_policy_engine_program_account<'a, 'b, 'c>(
                 authority: Set(pe.authority.to_bytes().to_vec()),
                 delegate: Set(pe.delegate.to_bytes().to_vec()),
                 max_timeframe: Set(pe.max_timeframe),
-                policies: Set(Some(json!({ "policies": pe.policies}))),
                 version: Set(PolicyEngineVersion::from(pe.version)),
                 closed: Set(false),
                 slot_updated: Set(account_update.slot() as i64),
@@ -64,45 +62,20 @@ pub async fn handle_policy_engine_program_account<'a, 'b, 'c>(
             Ok(())
         }
         PolicyEngineProgram::PolicyAccount(pe) => {
-            let (limit, timeframe) = match pe.policy {
-                Policy::TransactionAmountLimit { limit } => (Some(limit), None),
-                Policy::TransactionAmountVelocity { limit, timeframe } => {
-                    (Some(limit), Some(timeframe))
-                }
-                Policy::TransactionCountVelocity { limit, timeframe } => {
-                    (Some(limit), Some(timeframe))
-                }
-                _ => (None, None),
-            };
-
-            let total_limit: Option<sqlx::types::Decimal> = limit
-                .map(|l| sqlx::types::Decimal::from_u64(l).expect("Failed to convert to Decimal"));
-
             let active_model = policy_account::ActiveModel {
                 id: Set(key_bytes.clone()),
-                policy_type: Set(PolicyAccountType::from(pe.policy.clone())),
                 policy_engine: Set(pe.policy_engine.to_bytes().to_vec()),
-                comparsion_type: Set(pe.identity_filter.comparision_type.clone() as i32),
-                identity_levels: Set(Some(
-                    json!({ "identity_levels": pe.identity_filter.identity_levels}),
-                )),
                 slot_updated: Set(account_update.slot() as i64),
-                timeframe: Set(timeframe),
-                total_limit: Set(total_limit),
                 ..Default::default()
             };
-
+            let txn = db.begin().await?;
             let mut query = policy_account::Entity::insert(active_model)
                 .on_conflict(
                     OnConflict::columns([policy_account::Column::Id])
                         .update_columns([
-                            policy_account::Column::PolicyType,
-                            policy_account::Column::ComparsionType,
-                            policy_account::Column::IdentityLevels,
                             policy_account::Column::PolicyEngine,
-                            policy_account::Column::Timeframe,
-                            policy_account::Column::TotalLimit,
                             policy_account::Column::SlotUpdated,
+                            policy_account::Column::LastUpdatedAt,
                         ])
                         .to_owned(),
                 )
@@ -112,11 +85,82 @@ pub async fn handle_policy_engine_program_account<'a, 'b, 'c>(
                 "{} WHERE excluded.slot_updated >= policy_account.slot_updated OR policy_account.slot_updated IS NULL",
                 query.sql);
 
-            let txn = db.begin().await?;
             txn.execute(query)
                 .await
                 .map_err(|db_err| IndexerError::AssetIndexError(db_err.to_string()))?;
             txn.commit().await?;
+
+            // remove policies that are not in the array of policy accounts anymore and add extra if present using hash
+            let policies = pe.policies.clone();
+
+            let current_policies = policy::Entity::find()
+                .filter(policy::Column::PolicyAccount.eq(key_bytes.clone()))
+                .all(db)
+                .await
+                .map_err(|db_err| IndexerError::AssetIndexError(db_err.to_string()))?;
+
+            let txn = db.begin().await?;
+            txn.begin().await?;
+            for policy in policies.clone() {
+                let (limit, timeframe) = match policy.policy_type {
+                    PolicyType::IdentityApproval => (None, None),
+                    PolicyType::TransactionAmountLimit { limit } => (Some(limit as i64), None),
+                    PolicyType::TransactionAmountVelocity { limit, timeframe } => {
+                        (Some(limit as i64), Some(timeframe))
+                    }
+                    PolicyType::TransactionCountVelocity { limit, timeframe } => {
+                        (Some(limit as i64), Some(timeframe))
+                    }
+                };
+
+                let policy_type = policy.clone().into();
+
+                let active_model = policy::ActiveModel {
+                    id: Set(policy.hash.clone().into_bytes()),
+                    policy_account: Set(key_bytes.clone()),
+                    policy_type: Set(policy_type),
+                    identity_levels: Set(json!(policy.identity_filter.identity_levels)),
+                    comparision_type: Set(ComparisionType::from(
+                        policy.identity_filter.comparision_type as u8,
+                    )),
+                    limit: Set(limit), // update when limit is fixed
+                    timeframe: Set(timeframe),
+                    ..Default::default()
+                };
+
+                let query = policy::Entity::insert(active_model)
+                    .on_conflict(
+                        OnConflict::columns([policy::Column::Id])
+                            .update_columns([
+                                policy::Column::PolicyType,
+                                policy::Column::IdentityLevels,
+                                policy::Column::ComparisionType,
+                                policy::Column::Limit,
+                                policy::Column::Timeframe,
+                            ])
+                            .to_owned(),
+                    )
+                    .build(DbBackend::Postgres);
+                txn.execute(query).await?;
+            }
+            txn.commit().await?;
+
+            // delete policies that are in current_policies but not in policies
+            for current_policy in current_policies {
+                if !policies
+                    .clone()
+                    .iter()
+                    .any(|p| p.hash.clone().into_bytes() == current_policy.id)
+                {
+                    let active_model = policy::ActiveModel {
+                        id: Set(current_policy.id),
+                        ..Default::default()
+                    };
+                    let query = policy::Entity::delete(active_model).build(DbBackend::Postgres);
+                    db.execute(query).await?;
+                }
+            }
+
             Ok(())
         }
         _ => Err(IndexerError::NotImplemented),

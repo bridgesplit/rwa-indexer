@@ -40,7 +40,7 @@ pub enum PolicyEngineVersion {
 }
 
 #[derive(Iden, Debug, PartialEq, Sequence)]
-pub enum PolicyAccountType {
+pub enum PolicyType {
     IdentityApproval,
     TransactionAmountLimit,
     TransactionAmountVelocity,
@@ -96,7 +96,6 @@ pub enum DataRegistry {
 #[derive(Copy, Clone, Iden)]
 pub enum DataAccount {
     DataAccountType,
-    DataRegistryVersion,
     #[iden = "data_account"]
     Table,
     Id,
@@ -160,17 +159,30 @@ pub enum PolicyEngine {
 
 #[derive(Copy, Clone, Iden)]
 pub enum PolicyAccount {
-    PolicyAccountType,
     #[iden = "policy_account"]
     Table,
     Id,
     PolicyEngine,
-    PolicyType,
-    IdentityLevels,
-    ComparsionType,
-    TotalLimit,
-    Timeframe,
     SlotUpdated,
     CreatedAt,
     LastUpdatedAt,
+}
+
+#[derive(Iden, Debug, PartialEq, Sequence)]
+pub enum ComparisionType {
+    Or,
+    And,
+}
+
+#[derive(Copy, Clone, Iden)]
+pub enum Policy {
+    #[iden = "policy"]
+    Table,
+    Id,
+    PolicyAccount,
+    PolicyType,
+    IdentityLevels,
+    ComparisionType,
+    Limit,
+    Timeframe,
 }

@@ -33,9 +33,9 @@ To get the indexer up and running on your local machine, follow these steps:
    Set the necessary environment variables:
 
     ```shell
-    export INDEXER_DATABASE_CONFIG='{listener_channel="backfill_item_added", url="postgres://postgres@localhost/rwa"}'
+    export INDEXER_DATABASE_CONFIG='{listener_channel="backfill_item_added", url="postgres://macha@localhost/rwa"}'
     export INDEXER_RPC_CONFIG='{url="http://localhost:8899", commitment="finalized"}'
-    export INDEXER_MESSENGER_CONFIG='{messenger_type="Redis", connection_config={ batch_size=1, redis_connection_str="redis://localhost" } }'
+    export INDEXER_MESSENGER_CONFIG='{messenger_type="Redis", connection_config={ batch_size=1, redis_connection_str="redis://127.0.0.1:6379" } }'
     export INDEXER_METRICS_HOST=127.0.0.1
     export INDEXER_METRICS_PORT=8125
     ```
@@ -51,7 +51,7 @@ To get the indexer up and running on your local machine, follow these steps:
    Configure the environment for the API:
 
     ```shell
-    export APP_DATABASE_URL=postgres://ingest@localhost/rwa
+    export APP_DATABASE_URL=postgres://macha@localhost/rwa
     export APP_SERVER_PORT=9090
     ```
 
