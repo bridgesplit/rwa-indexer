@@ -32,7 +32,7 @@ pub trait ApiContract: Send + Sync + 'static {
     #[rpc(
         name = "getRwaAccountsByAuthority",
         params = "named",
-        summary = "Get all RWA accounts by its mint"
+        summary = "Get all RWA accounts by its authority"
     )]
     async fn get_rwa_accounts_by_authority(
         &self,
@@ -42,7 +42,7 @@ pub trait ApiContract: Send + Sync + 'static {
     #[rpc(
         name = "getRwaAccountsByDelegate",
         params = "named",
-        summary = "Get all RWA accounts by its mint"
+        summary = "Get all RWA accounts by its delegate"
     )]
     async fn get_rwa_accounts_by_delegate(
         &self,

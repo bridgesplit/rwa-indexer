@@ -35,6 +35,32 @@ impl RpcApiBuilder {
         )?;
         module.register_alias("getRwaAccountsByMint", "get_rwa_accounts_by_mint")?;
 
+        // get_rwa_accounts_by_authority
+        module.register_async_method(
+            "get_rwa_accounts_by_authority",
+            |rpc_params, rpc_context| async move {
+                let payload = rpc_params.parse::<GetRwaAccountsByMint>()?;
+                rpc_context
+                    .get_rwa_accounts_by_authority(payload)
+                    .await
+                    .map_err(Into::into)
+            },
+        )?;
+        module.register_alias("getRwaAccountsByAuthority", "get_rwa_accounts_by_authority")?;
+
+        // get_rwa_accounts_by_delegate
+        module.register_async_method(
+            "get_rwa_accounts_by_delegate",
+            |rpc_params, rpc_context| async move {
+                let payload = rpc_params.parse::<GetRwaAccountsByMint>()?;
+                rpc_context
+                    .get_rwa_accounts_by_delegate(payload)
+                    .await
+                    .map_err(Into::into)
+            },
+        )?;
+        module.register_alias("getRwaAccountsByDelegate", "get_rwa_accounts_by_delegate")?;
+
         module.register_async_method("schema", |_, rpc_context| async move {
             Ok(rpc_context.schema())
         })?;

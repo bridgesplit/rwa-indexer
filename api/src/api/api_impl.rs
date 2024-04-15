@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use open_rpc_derive::document_rpc;
 use open_rpc_schema::document::OpenrpcDocument;
-use rwa_types::rapi::{get_rwa_accounts_by_mint, FullAccount};
+use rwa_types::rapi::{get_rwa_accounts_by_authority, get_rwa_accounts_by_delegate, get_rwa_accounts_by_mint, FullAccount};
 use sea_orm::{ConnectionTrait, DbBackend, Statement};
 use solana_sdk::pubkey::Pubkey;
 use sqlx::postgres::PgPoolOptions;
@@ -74,7 +74,7 @@ impl ApiContract for RwaApi {
         let GetRwaAccountsByMint { id } = payload;
         let id_bytes = validate_pubkey(id.clone())?.to_bytes().to_vec();
 
-        get_rwa_accounts_by_mint(&self.db_connection, id_bytes)
+        get_rwa_accounts_by_authority(&self.db_connection, id_bytes)
             .await
             .map_err(Into::into)
     }
@@ -86,7 +86,7 @@ impl ApiContract for RwaApi {
         let GetRwaAccountsByMint { id } = payload;
         let id_bytes = validate_pubkey(id.clone())?.to_bytes().to_vec();
 
-        get_rwa_accounts_by_mint(&self.db_connection, id_bytes)
+        get_rwa_accounts_by_delegate(&self.db_connection, id_bytes)
             .await
             .map_err(Into::into)
     }
