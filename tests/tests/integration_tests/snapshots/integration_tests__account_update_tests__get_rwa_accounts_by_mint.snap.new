@@ -31,18 +31,7 @@ expression: response
     "mint": "Ea1yrC1xRXd6tWcHL4yhGRB31j6jTwdeqd3e9LHaYUwj",
     "authority": "dqci6TGXWGTki8DTQ1QcJ3qg4fPbxUzj6MwJBGjuhHX",
     "delegate": "EVfbhfNeH9TqcBVbr9TEGpQvKgR51vJSLiwZXvLoR7DG",
-    "policies": [
-      "9ouBMZVbQeVLjpi6oewvM4aEc16cuQCB1mmwgrkVjCbL",
-      "DMX8iMbWnw82gSDjMQ9fVYNNYFj4f3ceKd7vHi3x3eMG",
-      "Cg5wADuxpSVQdAxhMwdCzDQzPwVLa6aTu3uG3eNTD2CY",
-      "5ynb2SyJSxF17DRq8vvDSQVV1xKx6g8B5LsnzUwEnKRe",
-      "11111111111111111111111111111111",
-      "11111111111111111111111111111111",
-      "11111111111111111111111111111111",
-      "11111111111111111111111111111111",
-      "11111111111111111111111111111111",
-      "11111111111111111111111111111111"
-    ],
+    "policies": [],
     "version": 1,
     "closed": false
   }

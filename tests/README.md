@@ -11,8 +11,8 @@ Also gain access to mainnet RPCs and devnet RPCs and export the URLs as follows.
 we only use these URLs for reading data and storing it locally.
 
 ```
-export DEVNET_RPC_URL=...
-export MAINNET_RPC_URL=...
+export DEVNET_RPC_URL='https://mainnet.helius-rpc.com/?api-key=5899ce49-071c-4a22-a6e0-c0e9217d5a5a'
+export MAINNET_RPC_URL='https://devnet.helius-rpc.com/?api-key=5899ce49-071c-4a22-a6e0-c0e9217d5a5a'
 ```
 
 Afterwards, you can simply run the following command to run tests:

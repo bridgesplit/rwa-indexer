@@ -32,42 +32,42 @@ To get the indexer up and running on your local machine, follow these steps:
 2. **Environment Variables**:
    Set the necessary environment variables:
 
-    ```shell
-    export INDEXER_DATABASE_CONFIG='{listener_channel="backfill_item_added", url="postgres://macha@localhost/rwa"}'
-    export INDEXER_RPC_CONFIG='{url="http://localhost:8899", commitment="finalized"}'
-    export INDEXER_MESSENGER_CONFIG='{messenger_type="Redis", connection_config={ batch_size=1, redis_connection_str="redis://127.0.0.1:6379" } }'
-    export INDEXER_METRICS_HOST=127.0.0.1
-    export INDEXER_METRICS_PORT=8125
-    ```
+   ```shell
+   export INDEXER_DATABASE_CONFIG='{listener_channel="backfill_item_added", url="postgres://chrishagedorn@localhost/rwa"}'
+   export INDEXER_RPC_CONFIG='{url="http://localhost:8899", commitment="finalized"}'
+   export INDEXER_MESSENGER_CONFIG='{messenger_type="Redis", connection_config={ batch_size=1, redis_connection_str="redis://127.0.0.1:6379" } }'
+   export INDEXER_METRICS_HOST=127.0.0.1
+   export INDEXER_METRICS_PORT=8125
+   ```
 
 3. **Run the Indexer**:
    Navigate to the `indexer` directory and start the indexer:
 
-    ```shell
-    cargo run -p indexer
-    ```
+   ```shell
+   cargo run -p indexer
+   ```
 
 4. **API Environment Variable**:
    Configure the environment for the API:
 
-    ```shell
-    export APP_DATABASE_URL=postgres://macha@localhost/rwa
-    export APP_SERVER_PORT=9090
-    ```
+   ```shell
+   export APP_DATABASE_URL=postgres://chrishagedorn@localhost/rwa
+   export APP_SERVER_PORT=9090
+   ```
 
 5. **Run the API**:
    In the `api` folder, initiate the API service:
 
-    ```shell
-    cargo run -p rwa_api
-    ```
+   ```shell
+   cargo run -p rwa_api
+   ```
 
 6. **Account Forwarder Tool**:
    Use the account forwarder to process RWA accounts for a specific token mint:
 
-    ```shell
-    cargo run -- --redis-url 'redis://localhost:6379' --rpc-url '<RPC_URL>' mint --mint <MINT_ADDRESS>
-    ```
+   ```shell
+   cargo run -- --redis-url 'redis://localhost:6379' --rpc-url 'http://localhost:8899' mint --mint 8rJ91uhka8chEkHqynXBTCkjc8rvUyB3QoLRpi36zYPa
+   ```
 
 ## Running Tests Locally
 
@@ -76,6 +76,6 @@ Ensure all changes to the indexer or API are covered by integration tests:
 - Refer to `tests.README.md` for detailed testing instructions.
 - Execute tests from the `tests` directory:
 
-    ```shell
-    cargo test
-    ```
+  ```shell
+  cargo test
+  ```

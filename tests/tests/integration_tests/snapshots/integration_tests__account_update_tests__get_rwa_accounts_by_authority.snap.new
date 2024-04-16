@@ -1,0 +1,6 @@
+---
+source: tests/tests/integration_tests/account_update_tests.rs
+assertion_line: 59
+expression: response
+---
+{}
